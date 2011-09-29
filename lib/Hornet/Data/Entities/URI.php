@@ -1,11 +1,9 @@
 <?php
 
 /*
- * This file is part of the Hornet Framework.
- *
- * (c) Tomasz Słomiński <tomasz@slominski.it>
- * 
- */
+* This file is part of the Hornet Framework.
+* (c) Tomasz Słomiński <tomasz@slominski.it>
+*/
 
 namespace Hornet\Data\Entities {
 	
@@ -32,7 +30,7 @@ namespace Hornet\Data\Entities {
 		# Exception messages
 		const EX_INVALID_ELEMENT	= "Invalid %s : %s";
 		const EX_INVALID_TYPE		= "Type of %s is invalid - should be string instead of %s";
-		const EX_SCHEME_NOT_ALLOWED = "Scheme %s is not allowed, try on of %s";
+		const EX_SCHEME_NOT_ALLOWED = "Scheme %s is not allowed, try one of %s";
 		const EX_INVALID_URI		= "%s is not a valid URI";
 
 				
@@ -45,9 +43,8 @@ namespace Hornet\Data\Entities {
 		const FROM_STRING_RE		= '|^(?P<xscheme>(?P<scheme>[^:/?#]+):)?(?P<authority>//(?P<xuserinfo>(?P<userinfo>[^/?#@]*)@)?(?P<host>[^/?#:]*)?(?P<xport>:(?P<port>\d+))?)?(?P<path>[^?#]*)?(?P<xquery>\?(?P<query>[^#]*))?(?P<xfragment>#(?P<fragment>.*))?|';
 	
 		# Config options
-		const OPT_USE_PHP_PARSER 	= 'use_php_parser';
-		const OPT_USE_PHP_VALIDATOR	= 'use_php_validator';
-		const OPT_ALLOWED_SCHEMES	= 'allowed_schemes';
+		const OPT_USE_PHP_PARSER 	= 'use_php_parser'; # use parse_url instead FROM_STRING_RE
+		const OPT_ALLOWED_SCHEMES	= 'allowed_schemes'; # allowed schemes (in lowercase)
 		
 	# PROTECTED VARIABLES
 
@@ -61,7 +58,8 @@ namespace Hornet\Data\Entities {
 		);
 		
 		/**
-		 * URI elements 
+		 * URI elements. Note that where PHP uses separate user and password,
+		 * we, in spirit of RFC, are using one field for both
 		 * @var array
 		 */
 		protected $aData = array(
@@ -80,7 +78,6 @@ namespace Hornet\Data\Entities {
 		 */
 		protected $aConfig = array(
 			self::OPT_USE_PHP_PARSER 	=> true,
-			self::OPT_USE_PHP_VALIDATOR => false,
 			self::OPT_ALLOWED_SCHEMES   => array()
 		);
 		
@@ -211,13 +208,13 @@ namespace Hornet\Data\Entities {
 			
 			} // if
 			
-			if ($this->aData[self::USERINFO] !== null || $this->aData[self::HOST] !== null || $this->aData[self::PORT] !== null){
+			if (!empty($this->aData[self::USERINFO]) || $this->aData[self::HOST] !== null || !empty($this->aData[self::PORT])){
 								
 				$aResult[] = '//';
 				
 			} // if
 
-			if ($this->aData[self::USERINFO] !== null){
+			if (!empty($this->aData[self::USERINFO])){
 			
 				$aResult[] = $this->aData[self::USERINFO];
 				
@@ -231,7 +228,7 @@ namespace Hornet\Data\Entities {
 			
 			} // if
 			
-			if ($this->aData[self::PORT] !== null){
+			if (!empty($this->aData[self::PORT])){
 				
 				$aResult[] = ':';
 				
