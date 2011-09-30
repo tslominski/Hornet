@@ -13,6 +13,7 @@ namespace Hornet\Data\Entities {
 	 * Uniform Resource Identifier representation and handling
 	 * @author Tomasz Słomiński <tomasz@slominski.it>
 	 * @see RFC 3986 <http://tools.ietf.org/html/rfc3986> 
+	 * @version 1.0
 	 */
 	class URI {
 		
