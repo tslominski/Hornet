@@ -444,13 +444,17 @@ namespace Hornet\Data\Entities {
 		
 		/**
 		 * Sets port
-		 * @param string|integer $mPort Port number
+		 * @param string|integer|null $mPort Port number
 		 * @throws InvalidArgumentException
 		 * @return \Hornet\Data\Entities\URI Self
 		 */
 		public function setPort($mPort){
 				
-			if ($this->isValidPort($mPort)){
+			if ($mPort === null) {
+				
+				$this->aData[self::PORT] = $mPort;
+				
+			} else if ($this->isValidPort($mPort)){
 		
 				$this->aData[self::PORT] = (string)$mPort;
 		
@@ -487,19 +491,19 @@ namespace Hornet\Data\Entities {
 
 		/**
 		 * Sets path
-		 * @param string $sPath Path
+		 * @param string|null $mPath Path
 		 * @throws InvalidArgumentException
 		 * @return \Hornet\Data\Entities\URI Self
 		 */
-		public function setPath($sPath){
+		public function setPath($mPath){
 		
-			if ($this->isValidPath($sPath)){
+			if ($mPath === null || $this->isValidPath($mPath)){
 			
-				$this->aData[self::PATH] = $sPath;
+				$this->aData[self::PATH] = $mPath;
 			
 			} else {
 			
-				throw new InvalidArgumentException($this->getExceptionMessage(self::PATH, $sPath), 7);
+				throw new InvalidArgumentException($this->getExceptionMessage(self::PATH, $mPath), 7);
 							
 			} // if
 			
@@ -531,21 +535,21 @@ namespace Hornet\Data\Entities {
 
 		/**
 		 * Sets query
-		 * @param string $sQuery
+		 * @param string|null $mQuery
 		 * @throws InvalidArgumentException
 		 * @return \Hornet\Data\Entities\URI Self
 		 * @todo Allow query as array
 		 * @todo Make query and fragment optional (for POST etc.)
 		 */
-		public function setQuery($sQuery){
+		public function setQuery($mQuery){
 				
-			if ($this->isValidQuery($sQuery)){
+			if ($mQuery === null || $this->isValidQuery($mQuery)){
 		
-				$this->aData[self::QUERY] = $sQuery;
+				$this->aData[self::QUERY] = $mQuery;
 		
 			} else {
 		
-				throw new InvalidArgumentException($this->getExceptionMessage(self::QUERY, $sQuery), 8);
+				throw new InvalidArgumentException($this->getExceptionMessage(self::QUERY, $mQuery), 8);
 						
 			} // if
 				
@@ -576,19 +580,19 @@ namespace Hornet\Data\Entities {
 		
 		/**
 		 * Sets fragment
-		 * @param string $sFragment
+		 * @param string}null $mFragment
 		 * @throws InvalidArgumentException
 		 * @return \Hornet\Data\Entities\URI
 		 */
-		public function setFragment($sFragment){
+		public function setFragment($mFragment){
 			
-			if ($this->isValidFragment($sFragment)){
+			if ($mFragment === null || $this->isValidFragment($mFragment)){
 			
-				$this->aData[self::FRAGMENT] = $sFragment;
+				$this->aData[self::FRAGMENT] = $mFragment;
 			
 			} else {
 			
-				throw new InvalidArgumentException($this->getExceptionMessage(self::FRAGMENT, $sFragment), 9);
+				throw new InvalidArgumentException($this->getExceptionMessage(self::FRAGMENT, $mFragment), 9);
 							
 			} // if
 				
@@ -747,21 +751,13 @@ namespace Hornet\Data\Entities {
 		/**
 		 * Gets detailed exception message with variable type 
 		 * @param string $sElement Name of element
-		 * @param mixed $mVariable (Optional) Problematic variable
+		 * @param mixed $mVariable Problematic variable
 		 */
 		protected function getExceptionMessage($sElement, $mVariable = null){
-
-			if (func_num_args() == 2){
 				
-				return sprintf(self::EX_INVALID_ELEMENT, $sElement, var_export($mVariable, true));
-				
-			} else {
-				
-				return sprintf(self::EX_INVALID_ELEMENT, $sElement, '');
-				
-			}
+			return sprintf(self::EX_INVALID_ELEMENT, $sElement, func_num_args() == 2 ? var_export($mVariable, true) : '');
 			
-		}
+		} // getExceptionMessage
 		
 	} // class 
 	

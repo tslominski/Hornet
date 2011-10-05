@@ -127,6 +127,17 @@ namespace Test\Hornet\Data\Entities {
 		
 		}
 		
+		/**
+		* @expectedException InvalidArgumentException
+		*/
+		public function testHostDifferentThanStringThrowsException(){
+		
+			$oURI = new URI('http://example.net');
+		
+			$oURI->setHost(42);
+		
+		}
+		
 		public function testUserInfoIsChangedCorrectly(){
 			
 			$oURI = new URI('http://example.net');
@@ -197,6 +208,12 @@ namespace Test\Hornet\Data\Entities {
 			
 			$this->assertEquals('83', $oURI->getPort(), 'Returned port is not valid');
 			
+			$oURI->setPort(null);
+			
+			$this->assertEquals(null, $oURI->getPort(), 'Returned port is not valid');
+			
+			$this->assertEquals('http://example.net', (string)$oURI, 'Port is not changed properly');
+				
 		}		
 		
 		public function testEmptyPortIsNotIncludedIntoUri(){
@@ -235,6 +252,98 @@ namespace Test\Hornet\Data\Entities {
 			$oURI->setScheme('ftp');
 			
 		}
+		
+		public function testPathIsSetProperly(){
+				
+			$oURI = new URI('http://example.net');
+				
+			$this->assertEquals(null, $oURI->getPath(), 'Path should be null');
+				
+			$oURI->setPath('/path/to/url');
+				
+			$this->assertEquals('/path/to/url', $oURI->getPath(), 'Path is not set properly');
+		
+			$this->assertEquals('http://example.net/path/to/url', (string)$oURI, 'Path not parsed properly');
+		
+			$oURI->setPath(null);
+		
+			$this->assertEquals(null, $oURI->getPath(), 'Path should be nullified');
+				
+		}		
+
+		
+		/**
+		* @expectedException InvalidArgumentException
+		 */
+		public function testInvalidPathThrowsAnException(){
+		
+		$oURI = new URI('http://example.net');
+				
+					$oURI->setPath('|||');
+		
+		}
+		
+		
+		public function testQueryIsSetProperly(){
+			
+			$oURI = new URI('http://example.net');
+			
+			$this->assertEquals(null, $oURI->getQuery(), 'Query should be null');
+			
+			$oURI->setQuery('var1=k1&var2=k2');
+			
+			$this->assertEquals('var1=k1&var2=k2', $oURI->getQuery(), 'Query not set properly');
+
+			$this->assertEquals('http://example.net?var1=k1&var2=k2', (string)$oURI, 'Query not parsed properly');
+				
+			$oURI->setQuery(null);
+				
+			$this->assertEquals(null, $oURI->getQuery(), 'Query should be nullified');
+			
+		}
+		
+		
+		/**
+		* @expectedException InvalidArgumentException
+		 */
+		public function testInvalidQueryThrowsAnException(){
+		
+			$oURI = new URI('http://example.net');
+				
+			$oURI->setQuery('var1|var2');
+		
+		}		
+
+		public function testFragmentIsSetProperly(){
+				
+			$oURI = new URI('http://example.net');
+				
+			$this->assertEquals(null, $oURI->getFragment(), 'Fragment should be null');
+				
+			$oURI->setFragment('attop');
+				
+			$this->assertEquals('attop', $oURI->getFragment(), 'Fragment not set properly');
+		
+			$this->assertEquals('http://example.net#attop', (string)$oURI, 'Fragment not parsed properly');
+		
+			$oURI->setFragment(null);
+		
+			$this->assertEquals(null, $oURI->getFragment(), 'Fragment should be nullified');
+				
+		}
+		
+		
+		/**
+		 * @expectedException InvalidArgumentException
+		 */
+		public function testInvalidFragmentThrowsAnException(){
+		
+			$oURI = new URI('http://example.net');
+		
+			$oURI->setFragment('var1|var2');
+		
+		}		
+		
 		
 		public function testConfigArrayIsPassedProperlyInConstructor(){
 			
