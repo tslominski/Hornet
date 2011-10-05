@@ -14,6 +14,7 @@ namespace Hornet\Data\Entities {
 	 * @author Tomasz Słomiński <tomasz@slominski.it>
 	 * @see RFC 3986 <http://tools.ietf.org/html/rfc3986> 
 	 * @version 1.0
+	 * @todo Add URI string-to-elements cache
 	 */
 	class URI {
 		
@@ -33,14 +34,15 @@ namespace Hornet\Data\Entities {
 		const EX_INVALID_TYPE		= "Type of %s is invalid - should be string instead of %s";
 		const EX_SCHEME_NOT_ALLOWED = "Scheme %s is not allowed, try one of %s";
 		const EX_INVALID_URI		= "%s is not a valid URI";
-
 				
 		# Validation regexps
 		const SCHEME_VALIDATION_RE 		= '/^[[:alpha:]]+[[:alnum:]+\-.]*$/i';
 		const HOST_VALIDATION_RE		= '/^([[:alnum:]\-._~!$&\'()*+,;=]|%[0-9a-fA-F]{2})*$/i';
-		
 		const USERINFO_VALIDATION_RE 	= '/^([[:alnum:]\-._~!$&\'()*+,;=:]|%[0-9a-fA-F]{2})*$/i';
 		const FRAGMENT_VALIDATION_RE	= '/^([[:alnum:]\-._~!$&\'()*+,;=:@\/\?]|%[0-9a-fA-F]{2})*$/i';
+		const QUERY_VALIDATION_RE		= '/^([[:alnum:]\-._~!$&\'()*+,;=:@\/\?]|%[0-9a-fA-F]{2})*$/i';
+		# @todo not 100% valid yet!
+		const PATH_VALIDATION_RE		= '/^(\\/|\\/*(?:[[:alnum:]\-._~!$&\'()*+,;=:@]|%[0-9a-fA-F]{2}))*$/i';
 		
 		# Conversion regexp
 		const FROM_STRING_RE		= '|^(?P<xscheme>(?P<scheme>[^:/?#]+):)?(?P<xauthority>//(?P<authority>([^/?#@]*@)?([^/?#]*)?(:\d+)?))?(?P<path>[^?#]*)?(?P<xquery>\?(?P<query>[^#]*))?(?P<xfragment>#(?P<fragment>.*))?|';
@@ -53,11 +55,21 @@ namespace Hornet\Data\Entities {
 
 		/**
 		 * Validation cache
+		 * Key is regexp used to test validity of given element, so some elements
+		 * will wffectively share the same cache. This shouldn't be problem as long 
+		 * as :
+		 * 1) there is no other validation than regexp
+		 * 2) cache is used inside regexp validation method, not element validation method
 		 * @var array of arrays
 		 */
 		protected static $aCache = array(
 			self::SCHEME_VALIDATION_RE		=> array(),
 			self::USERINFO_VALIDATION_RE	=> array(),
+			self::QUERY_VALIDATION_RE		=> array(),
+			self::FRAGMENT_VALIDATION_RE	=> array(),
+			self::HOST_VALIDATION_RE		=> array(),		
+			self::PATH_VALIDATION_RE		=> array(),
+		
 		);
 		
 		/**
@@ -92,7 +104,7 @@ namespace Hornet\Data\Entities {
 		 * @param array|null $aConfig Optional array of configuration options.
 		 */
 		public function __construct($mURI = null, $aConfig = null){
-			
+
 			if (is_array($aConfig)){
 				
 				$this->aConfig = $aConfig + $this->aConfig;
@@ -513,8 +525,8 @@ namespace Hornet\Data\Entities {
 		 */
 		public function isValidPath($sPath){
 		
-			return true;
-		
+			return $this->isValidElement($sPath, self::PATH_VALIDATION_RE);
+					
 		} // isValidPath	
 
 		/**
@@ -555,12 +567,11 @@ namespace Hornet\Data\Entities {
 		* Tests whether query is valid.
 		* @param string $sQuery Query
 		* @return boolean True if query is valid
-		* @stub
 		*/		
 		public function isValidQuery($sQuery){
 				
-			return true;
-				
+			return $this->isValidElement($sQuery, self::QUERY_VALIDATION_RE);
+							
 		} // isValidQuery		
 		
 		/**
@@ -710,27 +721,6 @@ namespace Hornet\Data\Entities {
 				} // if
 				
 			} // if
-			
-			/*
-			if (!empty($aMatches['xuserinfo'])){
-							
-				$aResult['userinfo'] = $aMatches['userinfo'];
-			
-			} // if			
-			
-			if (!empty($aMatches['host'])){
-					
-				$aResult['host'] = $aMatches['host'];
-					
-			} // if
-			
-			if (!empty($aMatches['xport'])){
-						
-				$aResult['port'] = $aMatches['port'];
-						
-			} // if
-			
-			*/
 			
 			if (!empty($aMatches['path'])){
 			
