@@ -25,6 +25,29 @@ namespace Test\Hornet\Data\Entities {
 		
 		
 		/**
+		 * Good URI as array 
+		 */
+		public static function providerOfUriArray(){
+			
+			return array(
+				array(
+					array(
+						URI::SCHEME 	=> 'https',
+						URI::USERINFO 	=> 'user:password',
+						URI::HOST		=> 'example.net',
+						URI::PORT		=> '81',
+						URI::PATH		=> '/p/a/t/h',
+						URI::QUERY		=> 'key1=value1&key2=value2',
+						URI::FRAGMENT	=> 'top'	
+					), 
+					'https://user:password@example.net:81/p/a/t/h?key1=value1&key2=value2#top'
+				)					
+			);
+			
+		}
+		
+		
+		/**
 		 * Round trip
 		 * @dataProvider providerOfGoodUri
 		 */
@@ -62,15 +85,9 @@ namespace Test\Hornet\Data\Entities {
 			$oURI = new URI();
 			
 			$oURI->fromString(1);
-				
-			
-			
 			
 		}
 		
-		/**
-		 * 
-		 */
 		public function testSchemeIsChangedCorrectly(){
 
 			$oURI = new URI('http://google.com');
@@ -83,33 +100,29 @@ namespace Test\Hornet\Data\Entities {
 			
 			$this->assertEquals('https', $oURI->getScheme(), 'Scheme is not changed properly');
 				
-			
 		}
 		
-		/**
-		 * 
-		 */
 		public function testPortIsChangedCorrectly(){
 		
-			$oURI = new URI('http://google.com');
+			$oURI = new URI('http://example.net');
 
 			$this->assertEquals(null, $oURI->getPort(), 'Returned port is not valid');
 							
 			$oURI->setPort(81);
 				
-			$this->assertEquals('http://google.com:81', (string)$oURI, 'Port is not changed properly');
+			$this->assertEquals('http://example.net:81', (string)$oURI, 'Port is not changed properly');
 
 			$this->assertEquals('81', $oURI->getPort(), 'Returned port is not valid');
 			
 			$oURI->setPort(82);
 			
-			$this->assertEquals('http://google.com:82', (string)$oURI, 'Port is not changed properly');
+			$this->assertEquals('http://example.net:82', (string)$oURI, 'Port is not changed properly');
 			
 			$this->assertEquals('82', $oURI->getPort(), 'Returned port is not valid');
 			
 			$oURI->setPort('83');
 			
-			$this->assertEquals('http://google.com:83', (string)$oURI, 'Port is not changed properly');
+			$this->assertEquals('http://example.net:83', (string)$oURI, 'Port is not changed properly');
 			
 			$this->assertEquals('83', $oURI->getPort(), 'Returned port is not valid');
 			
@@ -120,7 +133,7 @@ namespace Test\Hornet\Data\Entities {
 		*/
 		public function testInvalidSchemeThrowsAnException(){
 				
-			$oURI = new URI('http://google.com');
+			$oURI = new URI('http://example.net');
 								
 			$oURI->setScheme('!66');
 				
@@ -131,7 +144,7 @@ namespace Test\Hornet\Data\Entities {
 		 */
 		public function testDisallowedSchemeThrowsAnException(){
 			
-			$oURI = new URI('http://google.com');
+			$oURI = new URI('http://example.net');
 			
 			$oURI->setOption(URI::OPT_ALLOWED_SCHEMES, array('http', 'https'));
 			
@@ -139,6 +152,39 @@ namespace Test\Hornet\Data\Entities {
 			
 		}
 		
+		public function testConfigArrayIsPassedProperlyInConstructor(){
+			
+			$oURI = new URI(null, array(URI::OPT_ALLOWED_SCHEMES=>array('gopher'), URI::OPT_USE_PHP_PARSER => false));
+			
+			$this->assertEquals(false, $oURI->getOption(URI::OPT_USE_PHP_PARSER), 'Option URI::OPT_USE_PHP_PARSER not passed properly via constructor');
+			
+			$this->assertEquals(array('gopher'), $oURI->getOption(URI::OPT_ALLOWED_SCHEMES), 'Option URI::OPT_ALLOWED_SCHEMES not passed properly via constructor');
+				
+		}
+		
+		/**
+		 * @dataProvider providerOfUriArray
+		 */
+		public function testUriIsCreatedFromArray($aURI, $sExpectedURI){
+			
+			$oURI = new URI();
+			
+			$oURI->fromArray($aURI);
+			
+			$this->assertEquals($sExpectedURI, (string)$oURI, sprintf('URI is not created properly from array (%s expected, %s returned)', $sExpectedURI, (string)$oURI));
+			
+		}
+		
+			/**
+		 * @dataProvider providerOfUriArray
+		 */
+		public function testUriIsCreatedFromArrayInConstructor($aURI, $sExpectedURI){
+			
+			$oURI = new URI($aURI);
+			
+			$this->assertEquals($sExpectedURI, (string)$oURI, sprintf('URI is not created properly from array (%s expected, %s returned)', $sExpectedURI, (string)$oURI));
+			
+		}
 	}
 	
 	
