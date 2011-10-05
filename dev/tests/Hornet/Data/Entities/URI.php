@@ -188,7 +188,6 @@ namespace Test\Hornet\Data\Entities {
 			
 		}		
 		
-		
 		public function testEmptyPortIsNotIncludedIntoUri(){
 			
 			$oURI = new URI('ftp://example.org:/resource.txt');
@@ -198,7 +197,6 @@ namespace Test\Hornet\Data\Entities {
 			$oURI = new URI('ftp://example.org:/resource.txt', array(URI::OPT_USE_PHP_PARSER=>false));
 				
 			$this->assertEquals(null, $oURI->getPort(), 'Returned port is not valid (regexp parser)');
-			
 			
 		}
 		
@@ -250,7 +248,7 @@ namespace Test\Hornet\Data\Entities {
 			
 		}
 		
-			/**
+		/**
 		 * @dataProvider providerOfUriArray
 		 */
 		public function testUriIsCreatedFromArrayInConstructor($aURI, $sExpectedURI){
@@ -260,7 +258,7 @@ namespace Test\Hornet\Data\Entities {
 			$this->assertEquals($sExpectedURI, (string)$oURI, sprintf('URI is not created properly from array (%s expected, %s returned)', $sExpectedURI, (string)$oURI));
 			
 		}
-	}
+
+	} // class
 	
-	
-}
+} // namespace
