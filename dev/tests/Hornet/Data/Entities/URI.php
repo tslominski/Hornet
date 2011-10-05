@@ -188,6 +188,21 @@ namespace Test\Hornet\Data\Entities {
 			
 		}		
 		
+		
+		public function testEmptyPortIsNotIncludedIntoUri(){
+			
+			$oURI = new URI('ftp://example.org:/resource.txt');
+			
+			$this->assertEquals(null, $oURI->getPort(), 'Returned port is not valid (native parser)');
+
+			$oURI = new URI('ftp://example.org:/resource.txt', array(URI::OPT_USE_PHP_PARSER=>false));
+				
+			$this->assertEquals(null, $oURI->getPort(), 'Returned port is not valid (regexp parser)');
+			
+			
+		}
+		
+		
 		/**
 		* @expectedException InvalidArgumentException
 		*/

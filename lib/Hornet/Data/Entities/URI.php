@@ -43,7 +43,6 @@ namespace Hornet\Data\Entities {
 		const FRAGMENT_VALIDATION_RE	= '/^([[:alnum:]\-._~!$&\'()*+,;=:@\/\?]|%[0-9a-fA-F]{2})*$/i';
 		
 		# Conversion regexp
-		// const FROM_STRING_RE		= '|^(?P<xscheme>(?P<scheme>[^:/?#]+):)?(?P<authority>//(?P<xuserinfo>(?P<userinfo>[^/?#@]*)@)?(?P<host>[^/?#]*)?(?P<xport>:(?P<port>\d+))?)?(?P<path>[^?#]*)?(?P<xquery>\?(?P<query>[^#]*))?(?P<xfragment>#(?P<fragment>.*))?|';
 		const FROM_STRING_RE		= '|^(?P<xscheme>(?P<scheme>[^:/?#]+):)?(?P<xauthority>//(?P<authority>([^/?#@]*@)?([^/?#]*)?(:\d+)?))?(?P<path>[^?#]*)?(?P<xquery>\?(?P<query>[^#]*))?(?P<xfragment>#(?P<fragment>.*))?|';
 		
 		# Config options
@@ -656,19 +655,12 @@ namespace Hornet\Data\Entities {
 		/**
 		 * Parses URI using sligthly modified regexp from RFC 3986. Actually, useless.
 		 * @param string $sURI URI to parse
-		 * @throws InvalidArgumentException
 		 * @return array Array of URI elements
 		 */
 		protected function parseFromStringRegexp($sURI){
 			
 			preg_match(self::FROM_STRING_RE, $sURI, $aMatches);
-			
-			if (empty($aMatches)){
-				
-				throw new InvalidArgumentException(sprintf(self::EX_INVALID_URI, $sURI), 10);
-				
-			} // if
-			
+					
 			$aResult = array();
 			
 			if (!empty($aMatches['xscheme'])){
@@ -696,7 +688,7 @@ namespace Hornet\Data\Entities {
 				if ($mDoubleDotPosition !== false){
 					
 					$nAuthorityLength = strlen($sAuthority);
-					
+
 					if ($mDoubleDotPosition == $nAuthorityLength - 1){
 						
 						$sAuthority = substr($sAuthority,0, $mDoubleDotPosition);
