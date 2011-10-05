@@ -162,6 +162,17 @@ namespace Test\Hornet\Data\Entities {
 		
 		}
 		
+		/**
+		* @expectedException InvalidArgumentException
+		*/
+		public function testInvalidPortThrowsAnException(){
+		
+			$oURI = new URI('http://example.net');
+		
+			$oURI->setPort('its@bad');
+		
+		}
+		
 		public function testPortIsChangedCorrectly(){
 		
 			$oURI = new URI('http://example.net');
