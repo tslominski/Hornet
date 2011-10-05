@@ -136,6 +136,17 @@ namespace Hornet\Data\Entities {
 		} // setOption
 		
 		/**
+		* Gets config option's value
+		* @param mixed $mOption Option name
+		* @return mixed|value Option value or null
+		*/
+		public function getOption($mOption){
+				
+			return isset($this->aConfig[$mOption]) ?  $this->aConfig[$mOption] : null;
+				
+		} // getOption
+				
+		/**
 		 * Initializes URI elements from array. See # URI elements names for
 		 * list of allowed elements
 		 * @param array $aURI URI elements
@@ -238,7 +249,7 @@ namespace Hornet\Data\Entities {
 			} // if
 
 			if ($this->aData[self::PATH] !== null){
-					
+
 				$aResult[] = $this->aData[self::PATH];
 
 			} // if
