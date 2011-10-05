@@ -37,12 +37,15 @@ namespace Hornet\Data\Entities {
 				
 		# Validation regexps
 		const SCHEME_VALIDATION_RE 		= '/^[[:alpha:]]+[[:alnum:]+\-.]*$/i';
+		const HOST_VALIDATION_RE		= '/^([[:alnum:]\-._~!$&\'()*+,;=]|%[0-9a-fA-F]{2})*$/i';
+		
 		const USERINFO_VALIDATION_RE 	= '/^([[:alnum:]\-._~!$&\'()*+,;=:]|%[0-9a-fA-F]{2})*$/i';
-		const FRAGMENT_VALIDATION_RE	= '/^([[:alnum:]\-._~!$&\'()*+,;=:@]|%[0-9a-fA-F]{2})*$/i';
+		const FRAGMENT_VALIDATION_RE	= '/^([[:alnum:]\-._~!$&\'()*+,;=:@\/\?]|%[0-9a-fA-F]{2})*$/i';
 		
 		# Conversion regexp
-		const FROM_STRING_RE		= '|^(?P<xscheme>(?P<scheme>[^:/?#]+):)?(?P<authority>//(?P<xuserinfo>(?P<userinfo>[^/?#@]*)@)?(?P<host>[^/?#:]*)?(?P<xport>:(?P<port>\d+))?)?(?P<path>[^?#]*)?(?P<xquery>\?(?P<query>[^#]*))?(?P<xfragment>#(?P<fragment>.*))?|';
-	
+		// const FROM_STRING_RE		= '|^(?P<xscheme>(?P<scheme>[^:/?#]+):)?(?P<authority>//(?P<xuserinfo>(?P<userinfo>[^/?#@]*)@)?(?P<host>[^/?#]*)?(?P<xport>:(?P<port>\d+))?)?(?P<path>[^?#]*)?(?P<xquery>\?(?P<query>[^#]*))?(?P<xfragment>#(?P<fragment>.*))?|';
+		const FROM_STRING_RE		= '|^(?P<xscheme>(?P<scheme>[^:/?#]+):)?(?P<xauthority>//(?P<authority>([^/?#@]*@)?([^/?#]*)?(:\d+)?))?(?P<path>[^?#]*)?(?P<xquery>\?(?P<query>[^#]*))?(?P<xfragment>#(?P<fragment>.*))?|';
+		
 		# Config options
 		const OPT_USE_PHP_PARSER 	= 'use_php_parser'; # use parse_url instead FROM_STRING_RE
 		const OPT_ALLOWED_SCHEMES	= 'allowed_schemes'; # allowed schemes (in lowercase)
@@ -340,19 +343,19 @@ namespace Hornet\Data\Entities {
 		
 		/**
 		 * Sets user info
-		 * @param string $sUserInfo
+		 * @param string|null $mUserInfo
 		 * @throws InvalidArgumentException
 		 * @return Hornet\Data\Entities\URI Self
 		 */
-		public function setUserInfo($sUserInfo = ''){
+		public function setUserInfo($mUserInfo = ''){
 			
-			if ($this->isValidUserInfo($sUserInfo)){
+			if ($mUserInfo === null || $this->isValidUserInfo($mUserInfo)){
 				
-				$this->aData[self::USERINFO] = $sUserInfo;
+				$this->aData[self::USERINFO] = $mUserInfo;
 				
 			} else {
 				
-				throw new InvalidArgumentException($this->getExceptionMessage(self::USERINFO, $sUserInfo), 4);
+				throw new InvalidArgumentException($this->getExceptionMessage(self::USERINFO, $mUserInfo), 4);
 								
 			} // if
 					
@@ -421,8 +424,12 @@ namespace Hornet\Data\Entities {
 		 */
 		public function isValidHost($sHost){
 				
-			return true;
+			return $this->isValidElement($sHost, self::HOST_VALIDATION_RE) || 
+					filter_var($sHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ||
+					(substr($sHost, 0, 1) == '[' && substr($sHost,-1) == ']' && filter_var(substr($sHost, 1, -1), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
 				
+			;
+							
 		} // isValidHost
 		
 		/**
@@ -671,6 +678,49 @@ namespace Hornet\Data\Entities {
 			
 			} // if
 			
+			if (!empty($aMatches['authority'])){
+				
+				$sAuthority = $aMatches['authority'];
+				
+				$mAtPosition = strpos($sAuthority, '@');
+				
+				if ($mAtPosition!== false){
+					
+					$aResult['userinfo'] = substr($sAuthority,0,$mAtPosition);
+					
+					$sAuthority = substr($sAuthority, $mAtPosition+1);
+					
+				} // if
+				
+				$mDoubleDotPosition = strrpos($sAuthority, ':');
+				
+				if ($mDoubleDotPosition !== false){
+					
+					$nAuthorityLength = strlen($sAuthority);
+					
+					if ($mDoubleDotPosition == $nAuthorityLength - 1){
+						
+						$sAuthority = substr($sAuthority,0, $mDoubleDotPosition);
+						
+					} else if (is_numeric(substr($sAuthority, $mDoubleDotPosition+1))){
+														
+						$aResult['port'] = substr($sAuthority,$mDoubleDotPosition + 1);
+								
+						$sAuthority = substr($sAuthority,0, $mDoubleDotPosition);
+						
+					} // if 
+
+				} // if
+				
+				if (!empty($sAuthority)){
+					
+					$aResult['host'] = $sAuthority;
+					
+				} // if
+				
+			} // if
+			
+			/*
 			if (!empty($aMatches['xuserinfo'])){
 							
 				$aResult['userinfo'] = $aMatches['userinfo'];
@@ -688,6 +738,8 @@ namespace Hornet\Data\Entities {
 				$aResult['port'] = $aMatches['port'];
 						
 			} // if
+			
+			*/
 			
 			if (!empty($aMatches['path'])){
 			

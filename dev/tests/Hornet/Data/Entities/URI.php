@@ -90,16 +90,76 @@ namespace Test\Hornet\Data\Entities {
 		
 		public function testSchemeIsChangedCorrectly(){
 
-			$oURI = new URI('http://google.com');
+			$oURI = new URI('http://example.net');
 			
 			$this->assertEquals('http', $oURI->getScheme(), 'Scheme is not changed properly');
 				
 			$oURI->setScheme('https');
 			
-			$this->assertEquals('https://google.com', (string)$oURI, 'Scheme is not changed properly');
+			$this->assertEquals('https://example.net', (string)$oURI, 'Scheme is not changed properly');
 			
 			$this->assertEquals('https', $oURI->getScheme(), 'Scheme is not changed properly');
 				
+		}
+		
+		public function testHostIsChangedCorrectly(){
+			
+			$oURI = new URI('http://example.net');
+				
+			$this->assertEquals('example.net', $oURI->getHost(), 'Host is not parsed properly');
+			
+			$oURI->setHost('example.com');
+				
+			$this->assertEquals('http://example.com', (string)$oURI, 'Host not changed properly');
+				
+			$this->assertEquals('example.com', $oURI->getHost(), 'Host is not changed properly');
+			
+		}
+
+		/**
+		* @expectedException InvalidArgumentException
+		*/
+		public function testInvalidHostThrowsAnException(){
+		
+			$oURI = new URI('http://example.net');
+		
+			$oURI->setHost('its@bad');
+		
+		}
+		
+		public function testUserInfoIsChangedCorrectly(){
+			
+			$oURI = new URI('http://example.net');
+						
+			$this->assertEquals(null, $oURI->getUserInfo(), 'User info should be null by default');
+
+			$oURI = new URI('http://user:pass@example.net');
+			
+			$this->assertEquals('user:pass', $oURI->getUserInfo(), 'User info not parsed properly');
+		
+			$oURI->setUserInfo('somebody:something');
+						
+			$this->assertEquals('somebody:something', $oURI->getUserInfo(), 'User info not parsed properly');
+									
+			$this->assertEquals('http://somebody:something@example.net', (string)$oURI, 'User info is not changed properly');
+			
+			$oURI->setUserInfo(null);
+									
+			$this->assertEquals(null, $oURI->getUserInfo(), 'User info not parsed properly');
+				
+			$this->assertEquals('http://example.net', (string)$oURI, 'User info is not changed properly');
+										
+		}
+						
+		/**
+		* @expectedException InvalidArgumentException
+		*/
+		public function testInvalidUserInfoThrowsAnException(){
+		
+			$oURI = new URI('http://example.net');
+		
+			$oURI->setUserInfo('its@bad');
+		
 		}
 		
 		public function testPortIsChangedCorrectly(){
@@ -127,16 +187,16 @@ namespace Test\Hornet\Data\Entities {
 			$this->assertEquals('83', $oURI->getPort(), 'Returned port is not valid');
 			
 		}		
-
+		
 		/**
 		* @expectedException InvalidArgumentException
 		*/
 		public function testInvalidSchemeThrowsAnException(){
-				
+		
 			$oURI = new URI('http://example.net');
-								
+		
 			$oURI->setScheme('!66');
-				
+		
 		}
 		
 		/**
