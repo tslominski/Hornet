@@ -420,7 +420,6 @@ namespace Hornet\Data\Entities {
 		 * Tests whether host is valid. Host can be a name or IP(4,6)
 		 * @param string $sHost Host
 		 * @return boolean True if host is valid
-		 * @stub
 		 */
 		public function isValidHost($sHost){
 				
