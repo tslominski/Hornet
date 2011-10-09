@@ -14,7 +14,11 @@ namespace Hornet\Data\Entities {
 	 * @author Tomasz Słomiński <tomasz@slominski.it>
 	 * @see RFC 3986 <http://tools.ietf.org/html/rfc3986> 
 	 * @version 1.0
+	 * @since 2011-10-06
 	 * @todo Add URI string-to-elements cache
+	 * @todo Revise path validation
+	 * @package Data
+	 * @subpackage Entities
 	 */
 	class URI {
 		
