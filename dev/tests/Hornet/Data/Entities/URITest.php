@@ -10,7 +10,9 @@ namespace Test\Hornet\Data\Entities {
 	use PHPUnit_Framework_TestCase;
 	use Hornet\Data\Entities\URI;
 	
-	require_once('/home/tomek/workspace/Hornet/lib/Hornet/Data/Entities/URI.php');
+	require_once implode(DIRECTORY_SEPARATOR, array(__DIR__,'..','..','bootstrap.php'));
+	
+	require_once implode(DIRECTORY_SEPARATOR, array(HORNET_LIB_PATH ,'Data','Entities','URI.php'));
 	
 	class URITest extends PHPUnit_Framework_TestCase{	
 		
