@@ -654,6 +654,7 @@ namespace Hornet\Data\Entities {
 		
 		/**
 		 * Parses URI using PHP's parse_url() built-in function
+		 * Seems not to include fragment if it is empty string (URI finished by #)
 		 * @param string $sURI URI to parse
 		 * @return array Array of URI elements
 		 */
