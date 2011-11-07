@@ -69,6 +69,15 @@ namespace Test\Hornet\Flow\RuleEngine\Rules {
 			$this->assertTrue($oRule->match(4));
 		} 
 		
+		/**
+		* @expectedException Hornet\Flow\RuleEngine\Exceptions\RuleEngineException
+		*/
+		public function testCompositeRuleThrowsExceptionIfCallbackIsNotCallable(){
+				
+			$oRuleSet = $this->getRuleSet(array(1,2,2,3,3,3));
+				
+			$oRule = new CompositeRule($oRuleSet, 'nonexistant');
+		}		
 	} // class
 	
 } // namespace
