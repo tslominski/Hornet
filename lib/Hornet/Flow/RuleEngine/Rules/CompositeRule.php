@@ -51,10 +51,10 @@ namespace Hornet\Flow\RuleEngine\Rules {
 		protected $aArgs	    = array();
 		
 		/**
-		 * 
-		 * Enter description here ...
+		 * Class constructor
 		 * @param Hornet\Flow\RuleEngine\RuleSet $oRuleSet
-		 * @param string $sCallback
+		 * @param string $sCallback Name of RuleEngine method to call (ie. all or any)
+		 * @param mixed $mArgument1,... (optional) Callback arguments
 		 */
 		public function __construct(RuleSet $oRuleSet, $sCallback = self::ALL){
 
@@ -86,7 +86,7 @@ namespace Hornet\Flow\RuleEngine\Rules {
 				
 			return (boolean)call_user_func_array($this->cCallback, $this->aArgs);
 			
-		}
+		} // compare
 	
 	} // interface
 
