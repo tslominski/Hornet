@@ -82,17 +82,24 @@ namespace Test\Hornet\Flow\RuleEngine\Rules {
 				
 		}
 		
-		public function testResolveFirstAndLastIsWorkingProperly(){
+		public function testResolveProductCallbackIsWorkingProperly(){
 			
-			$oRuleEngine = new RuleEngine($this->getRuleSet(array(1,2,2,3,3,3)));
+			$oRuleset = $this->getRuleSet(array(1,2,2,3,3,3));
+			
+			foreach ($oRuleset as $oRule){
+			
+				$oRule->setProductCallback(function($mContext){return $mContext * 2;});
+			
+			}
+			
+			$oRuleEngine = new RuleEngine($oRuleset);
 				
 			$oRuleEngine->setContext(3);
-			
-			$this->assertEquals(3, $oRuleEngine->resolve(RuleEngine::GET_FIRST));
-			$this->assertEquals(5, $oRuleEngine->resolve(RuleEngine::GET_LAST));			
-			$this->assertEquals(0, $oRuleEngine->resolve(RuleEngine::GET_FIRST, RuleEngine::NOT_MATCHING));
-			$this->assertEquals(2, $oRuleEngine->resolve(RuleEngine::GET_LAST, RuleEngine::NOT_MATCHING));			
-			
+			$this->assertEquals(array(6,6,6), $oRuleEngine->resolve(RuleEngine::GET_ALL));
+				
+			$this->assertEquals(6, $oRuleEngine->resolve(RuleEngine::GET_FIRST, RuleEngine::NOT_MATCHING));	
+			$this->assertEquals(6, $oRuleEngine->resolve(RuleEngine::GET_FIRST));
+				
 			
 		}
 
@@ -139,7 +146,7 @@ namespace Test\Hornet\Flow\RuleEngine\Rules {
 			
 			$oRuleEngine
 				->setContext(3)
-				->setComparator(function($a, $b){return $a === $b ? 0 : ($a > $b ? -1 : 1);});
+				->setComparator(function($a, $b){return $a === $b ? 0 : ($a < $b ? -1 : 1);});
 				
 			$this->assertEquals(9, $oRuleEngine->resolve(RuleEngine::GET_BEST));
 			$this->assertEquals(1, $oRuleEngine->resolve(RuleEngine::GET_WORST));
@@ -147,6 +154,24 @@ namespace Test\Hornet\Flow\RuleEngine\Rules {
 			$this->assertEquals(0, $oRuleEngine->resolve(RuleEngine::GET_WORST, RuleEngine::NOT_MATCHING));
 				
 				
+		}
+		
+		public function testResolveWorksWithProductCallback(){
+		
+			$oRuleEngine = new RuleEngine($this->getRuleSet(array(2=>1,1=>3,0=>2,3=>2,4=>3,9=>3,6=>3)));
+				
+			$oRuleEngine
+			->setContext(3)
+			->setComparator(function($a, $b){
+				return $a === $b ? 0 : ($a < $b ? -1 : 1);
+			});
+		
+			$this->assertEquals(9, $oRuleEngine->resolve(RuleEngine::GET_BEST));
+			$this->assertEquals(1, $oRuleEngine->resolve(RuleEngine::GET_WORST));
+			$this->assertEquals(3, $oRuleEngine->resolve(RuleEngine::GET_BEST, RuleEngine::NOT_MATCHING));
+			$this->assertEquals(0, $oRuleEngine->resolve(RuleEngine::GET_WORST, RuleEngine::NOT_MATCHING));
+		
+		
 		}
 		
 		public function testDefaultValueIsReturnedIfThereIsNoMatch(){

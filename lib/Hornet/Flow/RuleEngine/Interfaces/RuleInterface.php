@@ -42,10 +42,19 @@ namespace Hornet\Flow\RuleEngine\Interfaces {
 		public function setProduct($mProduct);
 		
 		/**
+		 * Sets product callback - used to generate product value if rule matches context
+		 * @param callable $cCallback Product callback
+		 * @throws Hornet\Flow\RuleEngine\Exceptions\RuleEngineException If callback is not callable
+		 * @return Hornet\Flow\RuleEngine\Interfaces\RuleInterface
+		 */
+		public function setProductCallback($cCallback);
+		
+		/**
 		 * Gets rule product (see doc for setProduct for description)
+		 * @param mixed $mContext Context (can be used to generate product value by callback) 
 		 * @return mixed Product 
 		 */
-		public function getProduct();
+		public function getProduct($mContext = null);
 		
 	} // interface
 

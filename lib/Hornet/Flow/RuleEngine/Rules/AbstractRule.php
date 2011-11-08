@@ -31,6 +31,12 @@ namespace Hornet\Flow\RuleEngine\Rules {
 		 * @var mixed
 		 */
 		protected $mProduct   = null;
+		
+		/**
+		 * Callback used to generate product. Should accept 1 argument, context
+		 * @var callable
+		 */
+		protected $cProductCallback = null;
 
 		/**
 		 * (non-PHPdoc)
@@ -78,13 +84,32 @@ namespace Hornet\Flow\RuleEngine\Rules {
 		
 		/**
 		 * (non-PHPdoc)
+		 * @see Hornet\Flow\RuleEngine\Interfaces.RuleInterface::setProductCallback()
+		 */
+		public function setProductCallback($cCallback){
+			
+			if (is_callable($cCallback)){
+				
+				$this->cProductCallback = $cCallback;
+				
+			} else {
+				
+				throw new RuleEngineException(sprintf(RuleEngineException::MSG_INVALID_PRODUCT_CALLBACK, gettype($cCallback)), RuleEngineException::EX_INVALID_PRODUCT_CALLBACK);
+				
+			} // if 
+			
+			return $this;			
+			
+		} // setProductCallback
+		
+		/**
+		 * (non-PHPdoc)
 		 * @see Hornet\Flow\RuleEngine\Interfaces.RuleInterface::getProduct()
 		 * @todo See if getProduct should'nt return class name if not set
-		 * @todo Support for dynamic product (ie. callbacks etc.)
 		 */
-		public function getProduct(){
+		public function getProduct($mContext = null){
 		
-			return $this->mProduct;
+			return $this->cProductCallback === null ? $this->mProduct : call_user_func($this->cProductCallback, $mContext);
 		
 		} // getProduct
 

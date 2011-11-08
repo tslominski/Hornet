@@ -272,7 +272,7 @@ namespace Hornet\Flow\RuleEngine {
 				
 				if ($oRule->match($this->mContext) === $bExpectedResult){
 					
-					$aProducts[] = $oRule->getProduct();
+					$aProducts[] = $oRule->getProduct($this->mContext);
 					
 					if ($nMode === self::GET_FIRST){
 						
@@ -319,7 +319,7 @@ namespace Hornet\Flow\RuleEngine {
 						
 						usort($aProducts, $this->cComparator);
 						
-						$mReturn = ($nMode === self::GET_BEST ? reset($aProducts) : end($aProducts));
+						$mReturn = ($nMode === self::GET_BEST ? end($aProducts) : reset($aProducts));
 						
 					} // if
 							

@@ -112,6 +112,45 @@ namespace Test\Hornet\Flow\RuleEngine\Rules {
 				
 		}
 		
+		
+		/**
+		* @expectedException Hornet\Flow\RuleEngine\Exceptions\RuleEngineException
+		*/
+		public function testCallbackRuleThrowsExceptionIfProductCallbackIsNotCallable(){
+				
+			$cCallback = function($mValue){
+				return $mValue === 'value1';
+			};
+			
+			$oRule = new CallbackRule($cCallback);
+		
+			$oRule->setProductCallback(array('nonexistantclass', '__call'));
+					
+		}
+
+		public function testProductCallbackIsReturned(){
+		
+			$cCallback = function($mValue){
+				return $mValue === 'value1';
+			};
+				
+			$oRule = new CallbackRule($cCallback);
+		
+			$oRule
+				->setProduct(42)
+				->setProductCallback(function($mContext){return 23;});
+			
+			$this->assertEquals(23, $oRule->getProduct(null));
+
+			
+			$oRule
+				->setProductCallback(function($mContext){return $mContext;});
+				
+			$this->assertEquals(66, $oRule->getProduct(66));
+			
+			
+		}		
+		
 	} // class
 	
 } // namespace
